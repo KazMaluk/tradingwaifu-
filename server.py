@@ -5,14 +5,17 @@ import os
 
 app = FastAPI()
 
-# Ensure the static folder exists
-if not os.path.exists("static"):
-    os.makedirs("static")
+# Resolve absolute path to static folder
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# Serve static files (frontend assets)
-app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+# Mount static files
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-# Serve `index.html` when users visit the root URL
-@app.get("/")
+# Serve index.html at root
+@app.get("/", response_class=FileResponse)
 async def serve_homepage():
-    return FileResponse("static/index.html")
+    file_path = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.exists(file_path):
+        return {"detail": f"File not found at {file_path}"}
+    return FileResponse(file_path, media_type="text/html")
