@@ -36,4 +36,45 @@
             <option value="long_term_holding">Long-Term Holding</option>
             <option value="swing_trading">Swing Trading</option>
             <option value="momentum_trading">Momentum Trading</option>
-            <option value="mean_reversion">Mean Reversion
+            <option value="mean_reversion">Mean Reversion</option>
+            <option value="arbitrage">Arbitrage</option>
+            <option value="trend_following">Trend Following</option>
+        </select>
+    </div>
+    
+    <div class="w-full max-w-md bg-gray-900 p-6 rounded-lg glow-border fade-in mt-6">
+        <div class="chat-container bg-gray-800 p-4 text-sm text-white" id="chatbox">
+            <p class="text-purple-400">🤖 AI: Welcome! Choose a personality and strategy, then start chatting!</p>
+        </div>
+        <div class="flex mt-4">
+            <input type="text" id="message" class="flex-1 p-2 rounded-lg bg-gray-800 text-white" placeholder="Ask about crypto trends...">
+            <button onclick="sendRequest()" class="ml-2 p-2 bg-purple-500 rounded-lg hover:bg-purple-700 transition-all">Send</button>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = "https://web-production-1fa7.up.railway.app/chat"; // Update this with your Railway backend URL
+
+        async function sendRequest() {
+            const personality = document.getElementById('personality').value;
+            const strategy = document.getElementById('strategy').value;
+            const message = document.getElementById('message').value;
+            
+            const chatbox = document.getElementById('chatbox');
+            chatbox.innerHTML += `<p class='text-blue-400'>💬 You: ${message}</p>`;
+            document.getElementById('message').value = '';
+            
+            const res = await fetch(API_BASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, personality, strategy })
+            });
+            
+            const data = await res.json();
+            chatbox.innerHTML += `<p class='text-purple-400'>🤖 AI: ${data.response}</p>`;
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
+
