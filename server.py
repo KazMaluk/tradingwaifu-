@@ -8,5 +8,5 @@ app = FastAPI()
 if not os.path.exists("static"):
     os.makedirs("static")
 
-# Serve static files (this serves `index.html` properly)
+# Serve `index.html` from the `static/` directory
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
