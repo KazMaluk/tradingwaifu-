@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Crypto AI Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a002a; color: #fff; font-family: 'Poppins', sans-serif; }
+        .neon-text { text-shadow: 0 0 5px #bb00ff, 0 0 10px #bb00ff, 0 0 20px #bb00ff; animation: glow 1.5s infinite alternate; }
+        .glow-border { box-shadow: 0px 0px 20px 2px #bb00ff; }
+        .fade-in { animation: fadeIn 1.2s ease-in-out; }
+        .chat-container { height: 400px; overflow-y: auto; border-radius: 10px; background: #222; padding: 10px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes glow { from { opacity: 0.8; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen flex-col px-4">
+    
+    <h1 class="text-4xl font-bold neon-text mb-6 fade-in">Anime Crypto AI Assistant</h1>
+    <p class="text-lg fade-in text-center max-w-lg">Welcome to your **AI-powered anime assistant** for crypto trading insights. Choose an **anime personality**, select your **trading strategy**, and chat with your AI trading waifu! 🚀</p>
+    
+    <div class="w-full max-w-md bg-gray-900 p-6 rounded-lg glow-border fade-in mt-6">
+        <label class="block mb-2">Select Your AI Personality:</label>
+        <select id="personality" class="w-full p-2 rounded-lg bg-gray-800 text-white">
+            <option value="tsundere_trader">Tsundere Trader</option>
+            <option value="kuudere_analyst">Kuudere Analyst</option>
+            <option value="genki_gambler">Genki Gambler</option>
+            <option value="yandere_financier">Yandere Financier</option>
+            <option value="onee_san_investor">Onee-san Investor</option>
+        </select>
+        
+        <label class="block mt-4 mb-2">Select Your Trading Strategy:</label>
+        <select id="strategy" class="w-full p-2 rounded-lg bg-gray-800 text-white">
+            <option value="scalping">Scalping</option>
+            <option value="long_term_holding">Long-Term Holding</option>
+            <option value="swing_trading">Swing Trading</option>
+            <option value="momentum_trading">Momentum Trading</option>
+            <option value="mean_reversion">Mean Reversion
