@@ -5,14 +5,12 @@ import os
 
 app = FastAPI()
 
-# Debug environment
 PORT = os.getenv("PORT", "8080")
 print(f"Starting app on port: {PORT}")
 print(f"Current working directory: {os.getcwd()}")
 
-# Static file setup
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, "static")
+# Hardcode Railway’s expected path
+STATIC_DIR = "/app/static"
 print(f"Static folder exists: {os.path.exists(STATIC_DIR)}")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
