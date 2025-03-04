@@ -1,80 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Crypto AI Assistant</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #1a002a; color: #fff; font-family: 'Poppins', sans-serif; }
-        .neon-text { text-shadow: 0 0 5px #bb00ff, 0 0 10px #bb00ff, 0 0 20px #bb00ff; animation: glow 1.5s infinite alternate; }
-        .glow-border { box-shadow: 0px 0px 20px 2px #bb00ff; }
-        .fade-in { animation: fadeIn 1.2s ease-in-out; }
-        .chat-container { height: 400px; overflow-y: auto; border-radius: 10px; background: #222; padding: 10px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes glow { from { opacity: 0.8; } to { opacity: 1; } }
-    </style>
-</head>
-<body class="flex items-center justify-center min-h-screen flex-col px-4">
-    
-    <h1 class="text-4xl font-bold neon-text mb-6 fade-in">Anime Crypto AI Assistant</h1>
-    <p class="text-lg fade-in text-center max-w-lg">Welcome to your **AI-powered anime assistant** for crypto trading insights. Choose an **anime personality**, select your **trading strategy**, and chat with your AI trading waifu! 🚀</p>
-    
-    <div class="w-full max-w-md bg-gray-900 p-6 rounded-lg glow-border fade-in mt-6">
-        <label class="block mb-2">Select Your AI Personality:</label>
-        <select id="personality" class="w-full p-2 rounded-lg bg-gray-800 text-white">
-            <option value="tsundere_trader">Tsundere Trader</option>
-            <option value="kuudere_analyst">Kuudere Analyst</option>
-            <option value="genki_gambler">Genki Gambler</option>
-            <option value="yandere_financier">Yandere Financier</option>
-            <option value="onee_san_investor">Onee-san Investor</option>
-        </select>
+from flask import Flask, request, jsonify, send_from_directory
+import requests
+import os
+
+app = Flask(__name__, static_folder="static")
+
+COINGECKO_API_URL = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
+
+@app.route("/")
+def serve_home():
+    return send_from_directory("static", "index.html")
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.json
+        user_message = data.get("message", "").lower()
         
-        <label class="block mt-4 mb-2">Select Your Trading Strategy:</label>
-        <select id="strategy" class="w-full p-2 rounded-lg bg-gray-800 text-white">
-            <option value="scalping">Scalping</option>
-            <option value="long_term_holding">Long-Term Holding</option>
-            <option value="swing_trading">Swing Trading</option>
-            <option value="momentum_trading">Momentum Trading</option>
-            <option value="mean_reversion">Mean Reversion</option>
-            <option value="arbitrage">Arbitrage</option>
-            <option value="trend_following">Trend Following</option>
-        </select>
-    </div>
-    
-    <div class="w-full max-w-md bg-gray-900 p-6 rounded-lg glow-border fade-in mt-6">
-        <div class="chat-container bg-gray-800 p-4 text-sm text-white" id="chatbox">
-            <p class="text-purple-400">🤖 AI: Welcome! Choose a personality and strategy, then start chatting!</p>
-        </div>
-        <div class="flex mt-4">
-            <input type="text" id="message" class="flex-1 p-2 rounded-lg bg-gray-800 text-white" placeholder="Ask about crypto trends...">
-            <button onclick="sendRequest()" class="ml-2 p-2 bg-purple-500 rounded-lg hover:bg-purple-700 transition-all">Send</button>
-        </div>
-    </div>
-    
-    <script>
-        const API_BASE_URL = "https://web-production-1fa7.up.railway.app/chat"; // Update this with your Railway backend URL
+        if not user_message:
+            return jsonify({"error": "Please enter a message."}), 400
 
-        async function sendRequest() {
-            const personality = document.getElementById('personality').value;
-            const strategy = document.getElementById('strategy').value;
-            const message = document.getElementById('message').value;
-            
-            const chatbox = document.getElementById('chatbox');
-            chatbox.innerHTML += `<p class='text-blue-400'>💬 You: ${message}</p>`;
-            document.getElementById('message').value = '';
-            
-            const res = await fetch(API_BASE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message, personality, strategy })
-            });
-            
-            const data = await res.json();
-            chatbox.innerHTML += `<p class='text-purple-400'>🤖 AI: ${data.response}</p>`;
-            chatbox.scrollTop = chatbox.scrollHeight;
-        }
-    </script>
-</body>
-</html>
+        # Fetch real-time market data from CoinGecko
+        response = requests.get(COINGECKO_API_URL, timeout=10)
+        response.raise_for_status()
+        market_data = response.json()
+        
+        btc_price = market_data.get('bitcoin', {}).get('usd', 'N/A')
+        eth_price = market_data.get('ethereum', {}).get('usd', 'N/A')
+        
+        market_summary = f"BTC: ${btc_price}, ETH: ${eth_price}."
+        
+        return jsonify({"response": f"Market Data: {market_summary}"})
+    
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "Failed to retrieve market data due to a timeout."}), 504
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Failed to retrieve market data: {e}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
