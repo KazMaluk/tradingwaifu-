@@ -1,6 +1,7 @@
 flask
 gunicorn
 uvicorn
+hypercorn
 requests
 openai
 python-dotenv
