@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 import requests
 import os
-from hypercorn.asyncio import serve
-from hypercorn.config import Config
 
 app = Flask(__name__, static_folder="static")
 
@@ -41,7 +39,5 @@ def chat():
         return jsonify({"error": f"Internal Server Error: {e}"}), 500
 
 if __name__ == "__main__":
-    config = Config()
-    config.bind = ["0.0.0.0:" + os.getenv("PORT", "5000")]
-    import asyncio
-    asyncio.run(serve(app, config))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
